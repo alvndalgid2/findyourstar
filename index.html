@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FIND YOUR STAR · 함안에서 나만의 별 찾기</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f0ff;--bg2:#ffe9d6;--ink:#2b2a5c;--card:#ffffffcc;--gold:#e8a200;--pink:#e0508f;--line:#2b2a5c33;--sky1:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1230;--bg2:#241a52;--ink:#f4f1ff;--card:#ffffff14;--gold:#ffd86b;--pink:#ff9ec7;--line:#ffffff33;--sky1:#ffd86b}}
+:root[data-theme="dark"]{--bg:#0e1230;--bg2:#241a52;--ink:#f4f1ff;--card:#ffffff14;--gold:#ffd86b;--pink:#ff9ec7;--line:#ffffff33;--sky1:#ffd86b}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--bg),var(--bg2));display:flex;justify-content:center;overflow-x:hidden}
+.stars{position:fixed;inset:0;pointer-events:none}
+.stars i{position:absolute;width:4px;height:4px;border-radius:50%;background:var(--sky1);opacity:.5;animation:tw 3s infinite ease-in-out}
+@keyframes tw{50%{opacity:.1;transform:scale(.6)}}
+main{position:relative;width:100%;max-width:440px;padding:28px 20px 40px;display:flex;flex-direction:column;justify-content:center;min-height:100vh}
+.screen{display:none;text-align:center}.screen.on{display:block;animation:pop .35s ease}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}
+h1{font-size:34px;line-height:1.25;margin:10px 0 8px}
+h2{font-size:22px;line-height:1.4;margin:14px 0 24px;font-weight:400}
+p{line-height:1.6;margin:0 0 14px}
+.sub{opacity:.8;font-size:16px}
+.bigstar{width:110px;height:110px;margin:0 auto;display:block;animation:float 3s infinite ease-in-out;filter:drop-shadow(0 0 18px var(--gold))}
+@keyframes float{50%{transform:translateY(-8px) rotate(4deg)}}
+button,a.go{font:inherit;color:inherit;cursor:pointer;text-decoration:none}
+.go{display:inline-block;background:var(--gold);color:#2b2a5c;border:0;border-radius:999px;padding:14px 34px;font-size:20px;margin-top:10px;box-shadow:0 6px 0 #0002}
+.go:active{transform:translateY(3px);box-shadow:0 3px 0 #0002}
+.ghost{background:none;border:2px solid var(--line);border-radius:999px;padding:10px 22px;margin:6px 4px 0;font-size:16px}
+.choice{display:block;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;font-size:18px;line-height:1.45;transition:.15s}
+.choice:hover,.choice:focus-visible{border-color:var(--gold);transform:scale(1.02)}
+.choice.sel{background:var(--gold);color:#2b2a5c;border-color:var(--gold)}
+:focus-visible{outline:3px solid var(--pink);outline-offset:3px}
+.place{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:15px}
+.bar{display:flex;gap:6px;justify-content:center;margin-bottom:14px}
+.bar b{width:30px;height:8px;border-radius:8px;background:var(--line);transition:.3s}.bar b.f{background:var(--gold)}
+.slots{display:flex;gap:10px;justify-content:center;margin:18px 0 20px;font-size:34px}
+.slots span{color:var(--line)}.slots span.f{color:var(--gold);text-shadow:0 0 12px var(--gold)}
+.pl{display:flex;justify-content:space-between;align-items:center;width:100%;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:16px 18px;margin-bottom:12px;font-size:19px;color:var(--ink)}
+.pl{text-decoration:none}.pl small{font-size:15px;opacity:.8}.pl.d{border-color:var(--gold)}.pl.d small{color:var(--gold);opacity:1;font-size:17px;text-shadow:0 0 10px var(--gold)}
+.story{font-size:17px;line-height:1.6;margin:16px 6px 22px}
+.load .bigstar{animation:spin 1.2s infinite linear}@keyframes spin{to{transform:rotate(360deg) scale(1.1)}}
+.card{background:var(--card);border:2px solid var(--gold);border-radius:28px;padding:26px 20px;backdrop-filter:blur(6px)}
+.card .type{font-size:18px;letter-spacing:.2em;opacity:.8}
+.card .name{font-size:46px;margin:2px 0 6px;color:var(--gold)}
+.chip{display:inline-block;background:var(--pink);color:#fff;border-radius:999px;padding:5px 14px;font-size:15px;margin-bottom:12px}
+.fnd{border-top:1px dashed var(--line);margin-top:14px;padding-top:14px;font-size:16px}
+.fnd strong{font-size:20px;color:var(--pink)}
+.toast{height:22px;font-size:14px;opacity:.8}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+body{word-break:keep-all;overflow-wrap:break-word}
+h2,.story,p,#pdm,#rg{white-space:pre-line;text-wrap:balance}
+</style>
+</head>
+<body>
+<div class="stars" id="stars" aria-hidden="true"></div>
+<main>
+<section class="screen" id="home">
+  <svg class="bigstar" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6l13 29 31 3-23 21 7 31-28-16-28 16 7-31L6 38l31-3z" fill="var(--gold)"/></svg>
+  <h1>FIND YOUR STAR</h1>
+  <p class="sub">함안에서 나만의 별을 찾다</p>
+  <p>세 장소를 돌며 별빛 조각 4개를 모으면<br>세상에 하나뿐인 내 별이 나타나요.</p>
+  <div class="slots" id="hs" aria-label="모은 별빛 조각"></div>
+  <div id="hp"></div>
+</section>
+<section class="screen" id="intro">
+  <span class="place" id="ip"></span>
+  <p class="story" id="is"></p>
+  <p class="sub" id="inn"></p>
+  <button class="go" id="ib">질문 시작하기</button>
+</section>
+<section class="screen" id="q">
+  <div class="bar" id="bar"></div>
+  <span class="place" id="place"></span>
+  <h2 id="qt"></h2>
+  <div id="ch"></div>
+</section>
+<section class="screen" id="pd">
+  <svg class="bigstar" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6l13 29 31 3-23 21 7 31-28-16-28 16 7-31L6 38l31-3z" fill="var(--gold)"/></svg>
+  <h2 id="pdt"></h2>
+  <div class="slots" id="ps"></div>
+  <p id="pdm"></p>
+  <a class="go" href="#home" id="pdg">내 별빛 조각 보기</a><br>
+  <button class="ghost" id="pdr">이 장소 다시 하기</button>
+</section>
+<section class="screen load" id="ld">
+  <svg class="bigstar" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6l13 29 31 3-23 21 7 31-28-16-28 16 7-31L6 38l31-3z" fill="var(--gold)"/></svg>
+  <h2>당신의 별을 찾는 중…</h2>
+  <p class="sub" id="ldm">밤하늘을 살펴보고 있어요</p>
+</section>
+<section class="screen" id="rs">
+  <div class="card">
+    <svg class="bigstar" style="width:90px;height:90px" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6l13 29 31 3-23 21 7 31-28-16-28 16 7-31L6 38l31-3z" fill="var(--gold)"/></svg>
+    <div class="type" id="rt"></div>
+    <div class="name" id="rn"></div>
+    <span class="chip" id="rc"></span>
+    <p id="rd"></p>
+    <div class="fnd">나와 어울리는 K거상<br><strong id="rf"></strong><p id="rg" style="margin-top:6px"></p></div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <button class="go" id="share">내 별 복사하기</button><br>
+  <button class="ghost" id="again">처음부터 다시</button>
+</section>
+</main>
+<script>
+var PL={
+house:{n:"조홍제 생가",s:"효성 창업주 조홍제 선생이 태어난 집.\n첫 번째 별빛이 시작된 자리예요.",t:"",q:[
+["대문을 들어선 순간, 나의 첫 행동은?", "E", "옆 사람에게 말을 걸며 분위기를 나눠요", "I", "조용히 혼자 둘러봐요"],
+["마당에 서면 먼저 눈에 들어오는 것은?", "E", "함께 온 사람들의 표정과 분위기", "I", "집의 구석구석, 나만의 시선이 닿는 곳"],
+["조홍제 선생 이야기에서 더 끌리는 것은?", "E", "학생들과 함께 만세운동에 나섰다가 옥고를 치른 이야기", "I", "동업을 정리하고 홀로 효성물산을 세운 이야기"],
+["조홍제 선생은 젊은 인재에게도 중책을 맡기고 지원을 아끼지 않았다고 해요.\n나라면 어떤 사람에게 중요한 일을 맡길까요?", "T", "실력과 성과가 검증된 사람", "F", "가능성과 진심이 느껴지는 사람"],
+["조홍제 선생은 일본 유학 시절 친구들과 자취집에 ‘동성사’라는 이름을 붙이고, 조국에 꼭 필요한 ‘동방의 별’이 되자고 다짐했다고 해요.\n그 자리에 내가 있었다면?", "T", "이름의 뜻이 정확하고 합리적인지 따져 봐요", "F", "친구들 마음이 하나가 되는 이름인지 살펴요"],
+["조홍제 선생은 설탕값이 폭등해도 구두로 한 약속의 가격을 지켰다는 일화가 전해져요.\n나라면 어떻게 할까요?", "T", "손해가 크면 사정을 설명하고 조건을 조정해요", "F", "손해를 보더라도 약속한 사람과의 신뢰를 지켜요"]]},
+mural:{n:"신창마을 벽화길",s:"조홍제 선생이 태어난 신창마을.\n골목을 따라 걸으며\n이어지는 벽화를 만나 보세요.",t:"주민분들이 사는 마을이에요.\n큰 소리는 삼가고 조용히 둘러봐 주세요.",q:[
+["벽화길에 들어섰어요. 먼저 눈에 들어오는 것은?", "S", "담벼락에 그려진 색과 그림 하나하나", "N", "골목 전체가 건네는 분위기와 이야기"],
+["태극기를 든 아이들 그림 앞에 섰어요. 나는?", "S", "옷차림과 표정, 들고 있는 것을 자세히 봐요", "N", "아이들이 외치는 소리와 그 마음을 상상해요"],
+["효성중공업과 이 마을은 ‘1사 1촌’ 사이예요.\n회사 한 곳과 마을 한 곳이\n짝이 되어 서로 돕는 인연이에요.\n더 마음이 가는 것은?", "S", "모내기를 돕고 마을회관을 고쳐 준 구체적인 도움", "N", "고향을 잊지 않는 마음이 이어진다는 의미"],
+["벽화길 중간에서 뒤를 돌아봤어요. 나는?", "S", "지나온 벽화들이 순서대로 떠올라요", "N", "걸어온 길 전체가 하나의 이야기로 느껴져요"],
+["이 골목 벽에 그림을 하나 더 그려 넣을 수 있다면?", "S", "오늘 걸으며 본 풍경을 그대로 그려요", "N", "아직 없는 상상 속 장면을 그려요"]]},
+pavilion:{n:"무진정",s:"별은 어두울수록 더 잘 보여요.\n정자에 앉아 잠시 걸음을 멈춰 보세요.",t:"",q:[
+["정자에 올라 앉았어요. 나는?", "J", "얼마나 쉴지 정하고 쉬어요", "P", "일어나고 싶을 때까지 그냥 있어요"],
+["연못을 바라보며 쉬는 시간, 나는?", "J", "사진도 찍고 이야기도 하며 알차게 보내요", "P", "아무것도 안 하고 멍하니 있어요"],
+["이 자리가 너무 좋은데 다음 일정이 가까워졌어요. 나는?", "J", "약속한 시간에 맞춰 일어나요", "P", "조금 더 머물고 일정을 바꿔요"],
+["여행 중 쉬고 싶어지면?", "J", "쉴 곳을 미리 정해 둬요", "P", "마음에 드는 곳에서 바로 쉬어요"],
+["오늘 여행을 마무리하는 방식은?", "J", "지난 일정을 되짚어 정리해요", "P", "느낌 가는 대로 마무리해요"]]}};
+var ORDER=["house","mural","pavilion"],SLOT={house:2,mural:1,pavilion:1};
+var G={NT:["솥별자리","이병철","사업보국과 인재제일을 앞세워 멀리 보고 판을 짠 삼성 창업주","의령 솥바위의 부자 기운에서 따온 별자리"],
+NF:["소나무별자리","구인회","사람의 화합(인화)을 중시하며 새 분야에 도전한 LG 창업주","진주 K-기업가정신센터의 ‘부자 소나무’에서 따온 별자리"],
+SJ:["만우별자리","조홍제","성실과 신용으로 효성을 일군 함안의 거상","조홍제 선생의 호 ‘만우’에서 따온 별자리"],
+SP:["승산별자리","허만정","사람을 믿고 과감하게 투자한 GS 창업의 뿌리","진주 승산부자마을에서 따온 별자리"]};
+var R={INTJ:["먼빛별","멀리 있는 빛을 먼저 보고 길을 그리는 설계자예요."],INTP:["아득별","아득히 깊은 곳까지 파고드는 탐구자예요."],ENTJ:["으뜸별","판을 키우고 앞장서는 으뜸 리더예요."],ENTP:["번개별","번뜩이는 발상으로 틀을 깨는 아이디어 뱅크예요."],
+INFJ:["이른별","남들보다 먼저 내일을 보는 조용한 비전가예요."],INFP:["윤슬별","물결처럼 잔잔히 반짝이는 이야기의 사람이에요."],ENFJ:["한결별","한결같은 마음으로 모두를 이끄는 길잡이예요."],ENFP:["송이별","꽃송이처럼 사람과 아이디어를 피워내는 사람이에요."],
+ISTJ:["곧은별","원칙을 지키며 신뢰를 쌓는 사람이에요."],ISFJ:["포근별","곁에서 묵묵히 온기를 보태는 사람이에요."],ESTJ:["든든별","실행력으로 중심을 잡아 주는 사람이에요."],ESFJ:["어울별","사람들을 어우러지게 만드는 따뜻한 사람이에요."],
+ISTP:["단숨별","말보다 손이 빠른, 단숨에 해내는 실전형이에요."],ISFP:["아롱별","자기만의 빛깔로 은은히 아롱지는 사람이에요."],ESTP:["불끈별","순간 판단과 추진력이 불끈 솟는 사람이에요."],ESFP:["해맑별","분위기를 환하게 밝히는 순간의 주인공이에요."]};
+var $=function(i){return document.getElementById(i)},st={a:{}},cur="",qi=0,last="",KEY="fys1";
+function load(){try{var v=JSON.parse(localStorage.getItem(KEY));if(v&&v.a)st=v}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+function done(p){return st.a[p]&&st.a[p].length===PL[p].q.length}
+function allDone(){return ORDER.every(done)}
+function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.toggle('on',s.id===id)});window.scrollTo(0,0)}
+function slotsHtml(){var h="";ORDER.forEach(function(p){for(var k=0;k<SLOT[p];k++)h+='<span class="'+(done(p)?'f':'')+'">★</span>'});return h}
+function sky(){var s=$('stars');for(var n=0;n<36;n++){var e=document.createElement('i');e.style.left=Math.random()*100+'%';e.style.top=Math.random()*100+'%';e.style.animationDelay=(Math.random()*3)+'s';s.appendChild(e)}}
+function home(){$('hs').innerHTML=slotsHtml();
+$('hp').innerHTML=ORDER.map(function(p){return '<a class="pl'+(done(p)?' d':'')+'" href="#'+p+'"><span>'+PL[p].n+'</span><small>'+(done(p)?'완료 ★':'하러가기')+'</small></a>'}).join('')+(allDone()?'<a class="go" href="#result">내 별 확인하기</a>':'');show('home')}
+function intro(p){cur=p;$('ip').textContent=PL[p].n;$('is').textContent=PL[p].s;$('inn').textContent=PL[p].t||"";$('ib').onclick=function(){st.a[p]=[];qi=0;ask()};show('intro')}
+function ask(){var P=PL[cur],q=P.q[qi];$('place').textContent=P.n;$('qt').textContent=q[0];
+$('bar').innerHTML=P.q.map(function(_,k){return '<b class="'+(k<=qi?'f':'')+'"></b>'}).join('');
+var c=$('ch');c.innerHTML='';[[q[1],q[2]],[q[3],q[4]]].forEach(function(o){var b=document.createElement('button');b.className='choice';b.textContent=o[1];
+b.onclick=function(){b.classList.add('sel');st.a[cur].push(o[0]);setTimeout(function(){qi++;if(qi<P.q.length){ask()}else{save();finish()}},260)};c.appendChild(b)});show('q')}
+function finish(){if(allDone()){location.hash="result";if(location.hash==="#result")route();return}
+var left=ORDER.filter(function(p){return !done(p)}).map(function(p){return PL[p].n});
+$('pdt').textContent=PL[cur].n+" 별빛 조각을 모았어요!";$('ps').innerHTML=slotsHtml();
+$('pdm').textContent="남은 장소: "+left.join(", ")+"\n그곳의 QR을 찍으면 이어서 할 수 있어요.";$('pdg').textContent="내 별빛 조각 보기";$('pdr').onclick=function(){intro(cur)};show('pd')}
+function result(){var l={};ORDER.forEach(function(p){st.a[p].forEach(function(x){l[x]=(l[x]||0)+1})});
+function pick(a,b){return (l[a]||0)>=(l[b]||0)?a:b}
+var ty=pick('E','I')+pick('S','N')+pick('T','F')+pick('J','P');ty=ty[0]+(ty[1]==='S'?'S':'N')+ty[2]+ty[3];
+var r=R[ty],g=G[ty[1]==='N'?(ty[2]==='T'?'NT':'NF'):(ty[3]==='J'?'SJ':'SP')];
+$('rt').textContent=ty;$('rn').textContent=r[0];$('rc').textContent=g[0];$('rd').textContent=r[1];$('rf').textContent=g[1];$('rg').textContent=g[2]+'.\n'+g[3]+'예요.';
+last='나는 함안에서 '+r[0]+'('+ty+')을 찾았어요! '+g[0]+', 어울리는 K거상은 '+g[1]+'. #FINDYOURSTAR #K거상 #함안';show('rs')}
+function route(){var h=location.hash.slice(1);
+if(PL[h]){cur=h;if(done(h)){$('pdt').textContent=PL[h].n+" 별빛 조각을 이미 모았어요!";$('ps').innerHTML=slotsHtml();$('pdm').textContent="다른 장소로 이어가거나 이곳을 다시 해 볼 수 있어요.";$('pdr').onclick=function(){intro(h)};show('pd')}else{intro(h)}}
+else if(h==="result"&&allDone()){show('ld');var m=["밤하늘을 살펴보고 있어요","반짝이는 별빛 조각을 모으는 중…","거상의 별자리와 맞춰 보는 중…"],k=0;
+var t=setInterval(function(){k++;if(k<m.length)$('ldm').textContent=m[k]},700);setTimeout(function(){clearInterval(t);result()},2200)}
+else{home()}}
+$('again').onclick=function(){st={a:{}};save();$('toast').textContent='';location.hash="home";route()};
+$('share').onclick=function(){var t=$('toast');try{navigator.clipboard.writeText(last).then(function(){t.textContent='복사했어요! SNS에 붙여 넣어 보세요'},function(){t.textContent=last})}catch(e){t.textContent=last}};
+window.addEventListener('hashchange',route);
+load();sky();route();
+</script>
+</body>
+</html>
